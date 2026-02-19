@@ -39,7 +39,13 @@
   "peerDependencies": {
     "@mariozechner/pi-coding-agent": "*"
   },
+  "peerDependenciesMeta": {
+    "@mariozechner/pi-coding-agent": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
     "@types/node": "^24",
     "oxfmt": "^0.33.0",
     "oxlint": "^1.48.0",
