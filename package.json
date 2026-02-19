@@ -1,12 +1,30 @@
 {
   "name": "pi-sandbox",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "OS-level sandboxing for pi with interactive permission prompts",
-  "keywords": ["pi-package"],
+  "keywords": [
+    "pi-package"
+  ],
   "type": "module",
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carderne/pi-sandbox.git"
+  },
+  "author": "Chris Arderne <chris@rdrn.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/carderne/pi-sandbox/issues"
+  },
+  "homepage": "https://github.com/carderne/pi-sandbox",
   "scripts": {
     "fmt": "oxfmt index.ts",
     "lint": "oxlint index.ts",
