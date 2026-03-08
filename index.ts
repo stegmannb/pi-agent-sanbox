@@ -578,7 +578,10 @@ export default function (pi: ExtensionAPI) {
     if (isToolCallEventType("read", event)) {
       const denyRead = config.filesystem?.denyRead ?? [];
       const allowRead = config.filesystem?.allowRead ?? [];
-      if (matchesPattern(event.input.path, denyRead) && !matchesPattern(event.input.path, allowRead)) {
+      if (
+        matchesPattern(event.input.path, denyRead) &&
+        !matchesPattern(event.input.path, allowRead)
+      ) {
         return {
           block: true,
           reason: `Sandbox: read access denied for "${event.input.path}"`,
