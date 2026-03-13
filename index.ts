@@ -673,6 +673,18 @@ export default function (pi: ExtensionAPI) {
         enableWeakerNetworkIsolation: true,
       });
 
+      // Make Node's built-in fetch() honour HTTP_PROXY / HTTPS_PROXY in this
+      // process and any child processes that inherit the environment.
+      // undici (which powers globalThis.fetch) ignores proxy env vars by default;
+      // --use-env-proxy (Node 22+) opts it in. We set this here so that node
+      // subprocesses spawned directly from bash (e.g. `node script.ts`) also
+      // pick it up without needing to go through wrapWithSandbox.
+      const nodeMajor = parseInt(process.versions.node.split(".")[0], 10);
+      if (nodeMajor >= 22) {
+        const existing = process.env.NODE_OPTIONS ?? "";
+        process.env.NODE_OPTIONS = existing ? `${existing} --use-env-proxy` : "--use-env-proxy";
+      }
+
       sandboxEnabled = true;
       sandboxInitialized = true;
 
