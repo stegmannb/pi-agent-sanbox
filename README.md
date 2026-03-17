@@ -12,9 +12,11 @@ prompted to allow it temporarily or permanently rather than silently failing.
 ![demo](./demo/demo.gif)
 
 ## Notes
-- Does not currently work with [agent-browser](https://agent-browser.dev/). Two options:
-  - Temporarily disable the sandbox with `/sandbox-disable` while you use it, then `/sandbox-enable`
-  - Add `"allowBrowserProcess": true` to your `sandbox.json`, then add then add the contents of [agent-browser-compat.md](./agent-browser-compat.md) to your agent-browser/SKILL.md.
+There is an example config at [sandbox.json](./sandbox.json). It was quite a few things added to get this extension to work with [agent-browser](https://agent-browser.dev/) and other common tools.
+
+These open significant security loopholes, so shouldn't be used in a sensitive context or when you don't need browser support.
+
+You may need to trial and error to find additional things you need to allow.
 
 ## Quickstart
 #### Install
@@ -31,7 +33,10 @@ Note below that the order of precedence for filesystem read and write are opposi
 ```json
 {
   "enabled": true,
+  "allowBrowserProcess": true,     // If you want to use agent-browser or similar Chrome setup
   "network": {
+    "allowLocalBinding": true,     // ditto
+    "allowAllUnixSockets": true,   // ditto
     "allowedDomains": ["github.com", "*.github.com"],
     "deniedDomains": []
   },
