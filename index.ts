@@ -192,7 +192,8 @@ const DEFAULT_CONFIG: SandboxConfig = {
 
 function loadConfig(cwd: string): SandboxConfig {
   const projectConfigPath = join(cwd, ".pi", "sandbox.json");
-  const globalConfigPath = join(homedir(), ".pi", "agent", "sandbox.json");
+  const agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent");
+  const globalConfigPath = join(agentDir, "sandbox.json");
 
   let globalConfig: Partial<SandboxConfig> = {};
   let projectConfig: Partial<SandboxConfig> = {};
@@ -333,8 +334,9 @@ function getConfigPaths(cwd: string): {
   globalPath: string;
   projectPath: string;
 } {
+  const agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent");
   return {
-    globalPath: join(homedir(), ".pi", "agent", "sandbox.json"),
+    globalPath: join(agentDir, "sandbox.json"),
     projectPath: join(cwd, ".pi", "sandbox.json"),
   };
 }
@@ -1044,6 +1046,12 @@ export default function (pi: ExtensionAPI) {
         sandboxEnabled = true;
         sandboxInitialized = true;
 
+        // Persist enabled state so session restarts respect the choice
+        const { globalPath } = getConfigPaths(ctx.cwd);
+        const persisted = readOrEmptyConfig(globalPath);
+        persisted.enabled = true;
+        writeConfigFile(globalPath, persisted);
+
         const networkCount = config.network?.allowedDomains?.length ?? 0;
         const writeCount = config.filesystem?.allowWrite?.length ?? 0;
         ctx.ui.setStatus(
@@ -1082,6 +1090,11 @@ export default function (pi: ExtensionAPI) {
       sandboxEnabled = false;
       sandboxInitialized = false;
       ctx.ui.setStatus("sandbox", "");
+      // Persist disabled state so session restarts respect the choice
+      const { globalPath } = getConfigPaths(ctx.cwd);
+      const persisted = readOrEmptyConfig(globalPath);
+      persisted.enabled = false;
+      writeConfigFile(globalPath, persisted);
       ctx.ui.notify("Sandbox disabled", "info");
     },
   });
