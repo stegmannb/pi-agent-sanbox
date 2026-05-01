@@ -181,12 +181,18 @@ const DEFAULT_CONFIG: SandboxConfig = {
       "raw.githubusercontent.com",
     ],
     deniedDomains: [],
+    // Allow Unix sockets (needed for SSH ControlMaster, etc.) and local
+    // port binding by default so tools like git-over-SSH work out of the box.
+    allowAllUnixSockets: true,
+    allowLocalBinding: true,
   },
   filesystem: {
     denyRead: ["/Users", "/home"],
     allowRead: [".", "~/.config", "~/.local", "Library"],
     allowWrite: [".", "/tmp"],
     denyWrite: [".env", ".env.*", "*.pem", "*.key"],
+    // Allow reading git config so `git` commands work without prompts.
+    allowGitConfig: true,
   },
 };
 
@@ -220,6 +226,7 @@ function deepMerge(
   if (overrides.enabled !== undefined) result.enabled = overrides.enabled;
   if (overrides.network) {
     result.network = {
+      // Merge array fields by concatenation
       allowedDomains: [
         ...(base.network?.allowedDomains ?? []),
         ...(overrides.network.allowedDomains ?? []),
@@ -228,6 +235,25 @@ function deepMerge(
         ...(base.network?.deniedDomains ?? []),
         ...(overrides.network.deniedDomains ?? []),
       ],
+      // Scalar/optional fields: override takes precedence, fall back to base
+      allowAllUnixSockets:
+        overrides.network.allowAllUnixSockets ?? base.network?.allowAllUnixSockets,
+      allowLocalBinding:
+        overrides.network.allowLocalBinding ?? base.network?.allowLocalBinding,
+      allowUnixSockets: [
+        ...(base.network?.allowUnixSockets ?? []),
+        ...(overrides.network.allowUnixSockets ?? []),
+      ],
+      allowMachLookup: [
+        ...(base.network?.allowMachLookup ?? []),
+        ...(overrides.network.allowMachLookup ?? []),
+      ],
+      httpProxyPort:
+        overrides.network.httpProxyPort ?? base.network?.httpProxyPort,
+      socksProxyPort:
+        overrides.network.socksProxyPort ?? base.network?.socksProxyPort,
+      mitmProxy: overrides.network.mitmProxy ?? base.network?.mitmProxy,
+      parentProxy: overrides.network.parentProxy ?? base.network?.parentProxy,
     };
   }
   if (overrides.filesystem) {
@@ -248,6 +274,9 @@ function deepMerge(
         ...(base.filesystem?.denyWrite ?? []),
         ...(overrides.filesystem.denyWrite ?? []),
       ],
+      // allowGitConfig: override wins, fall back to base
+      allowGitConfig:
+        overrides.filesystem.allowGitConfig ?? base.filesystem?.allowGitConfig,
     };
   }
 
