@@ -349,17 +349,24 @@ function writeConfigFile(configPath: string, config: Partial<SandboxConfig>): vo
  * "Allow for all projects" option when it would always fail.
  */
 function isConfigWritable(filePath: string): boolean {
-  try {
-    accessSync(filePath, constants.W_OK);
-    return true;
-  } catch {
-    // File doesn't exist yet — check whether the parent dir is writable
+  if (existsSync(filePath)) {
+    // File already exists (may be a read-only Nix-store symlink).
+    // Only the file itself determines writeability; a writable parent
+    // directory does NOT help because we cannot overwrite through a
+    // read-only symlink by creating a new file at the same path.
     try {
-      accessSync(dirname(filePath), constants.W_OK);
+      accessSync(filePath, constants.W_OK);
       return true;
     } catch {
       return false;
     }
+  }
+  // File does not exist yet — check whether we can create it.
+  try {
+    accessSync(dirname(filePath), constants.W_OK);
+    return true;
+  } catch {
+    return false;
   }
 }
 
