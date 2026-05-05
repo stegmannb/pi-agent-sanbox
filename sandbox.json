@@ -21,15 +21,7 @@
       "/Users"
     ],
     "allowRead": [
-      ".",
-      "~/projects",
-      "~/.config",
-      "~/.cargo",
-      "~/.local",
-      "~/Library",
-      "~/.cache",
-      "/Applications/Google Chrome.app",
-      "/System/Volumes/Data/Applications/Google Chrome.app"
+      "."
     ],
     "allowWrite": [
       ".",
